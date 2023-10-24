@@ -67,7 +67,6 @@ if (isset($_POST['submit'])) {
 
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -89,8 +88,10 @@ $conn->close();
                 <form method="post" action="submit">
                     <div class="form-group">
                         <label for="event">Event/Website</label>
-                        <input type="text" class="form-control" name="event" id="event" placeholder="Event/Website" value="<?php echo $event; ?>" required>
-                        <span class="text-danger"><?php echo $eventErr; ?></span>
+                        <select class="form-control" name="event" id="event" required>
+                            <option value="PicoCTF">PicoCTF</option>
+                            <option value="TryHackMe">TryHackMe</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="score">Score</label>
@@ -116,3 +117,4 @@ $conn->close();
     </div>
 </body>
 </html>
+

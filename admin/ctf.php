@@ -78,7 +78,7 @@ $records_per_page = 10;
 $offset = ($page - 1) * $records_per_page;
 
 // Admin is logged in, display the content with pagination and descending order
-$order_column = "unique_id"; // Change this to the column you want to order by
+$order_column = "added_time"; // Change this to the column you want to order by
 $query = "SELECT id, unique_id, event, score, link, screenshots, DATE_FORMAT(added_time, '%l:%i %p, %e %M %Y') AS formatted_time, status FROM submissions ORDER BY $order_column DESC LIMIT $offset, $records_per_page";
 $result = $conn->query($query);
 ?>
