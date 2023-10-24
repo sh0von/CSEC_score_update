@@ -13,8 +13,12 @@ if (isset($_POST['login'])) {
     $cuet_id = $_POST['cuet_id'];
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM users WHERE cuet_id = '$cuet_id'";
-    $result = $conn->query($query);
+    // Use a prepared statement to retrieve the user by CUET ID
+    $query = "SELECT * FROM users WHERE cuet_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $cuet_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows == 1) {
         $user = $result->fetch_assoc();
@@ -28,10 +32,15 @@ if (isset($_POST['login'])) {
     } else {
         $error = "User not found.";
     }
+
+    $stmt->close();
 }
 
 $conn->close();
-?><!DOCTYPE html>
+?>
+
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -37,16 +37,22 @@ if (isset($_POST['submit'])) {
     // Check if there are no validation errors
     if (empty($eventErr) && empty($scoreErr) && empty($linkErr)) {
         // Retrieve the unique ID from the user's registration data
-        $query = "SELECT unique_id FROM users WHERE id = '$user_id'";
-        $result = $conn->query($query);
+        $query = "SELECT unique_id FROM users WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
             $unique_id = $row['unique_id'];
 
-            // Insert the submission into the database
-            $query = "INSERT INTO submissions (unique_id, event, score, link, screenshots) VALUES ('$unique_id', '$event', '$score', '$link', '$screenshots')";
-            if ($conn->query($query) === TRUE) {
+            // Insert the submission into the database using prepared statement
+            $query = "INSERT INTO submissions (unique_id, event, score, link, screenshots) VALUES (?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("issss", $unique_id, $event, $score, $link, $screenshots);
+
+            if ($stmt->execute()) {
                 $submissionMessage = "Submission successful!";
             } else {
                 echo "Error: " . $query . "<br>" . $conn->error;
@@ -54,6 +60,8 @@ if (isset($_POST['submit'])) {
         } else {
             echo "User not found or invalid user data.";
         }
+
+        $stmt->close();
     }
 }
 
@@ -70,6 +78,7 @@ $conn->close();
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Event/Website</title>
 </head>
 <body class="bg-light">

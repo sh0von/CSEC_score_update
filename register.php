@@ -46,22 +46,28 @@ if (isset($_POST['register'])) {
     if (empty($emailErr) && empty($cuetIdErr) && empty($nameErr) && empty($passwordErr)) {
         // Generate a unique ID like CSEC-0001
         $query = "SELECT MAX(id) as max_id FROM users";
-        $result = $conn->query($query);
+        $stmt = $conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         $max_id = $row['max_id'] + 1;
         $unique_id = "CSEC-" . sprintf("%04d", $max_id);
 
-        $query = "INSERT INTO users (email, cuet_id, name, unique_id, password) VALUES ('$email', '$cuet_id', '$name', '$unique_id', '$password')";
-        if ($conn->query($query) === TRUE) {
+        $query = "INSERT INTO users (email, cuet_id, name, unique_id, password) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("sssss", $email, $cuet_id, $name, $unique_id, $password);
+
+        if ($stmt->execute()) {
             header("Location: index");
             exit();
         } else {
-            echo "Error: " . $query . "<br>" . $conn->error;
+            echo "Error: " . $query . "<br>" . $stmt->error;
         }
     }
 }
 $conn->close();
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
